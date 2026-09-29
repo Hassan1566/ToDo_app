@@ -343,6 +343,88 @@ The automated suite covers authentication, user isolation, CRUD operations, and 
 - [ ] Configure production Google OAuth redirect URI
 - [ ] Run final production checks
 
+
+
+## Deployment Preparation
+
+The project is prepared for a production deployment, but a hosting provider and production database still need to be selected.
+
+### Production checklist
+
+Before deploying:
+
+1. Set a strong, private `DJANGO_SECRET_KEY`.
+2. Set `DJANGO_DEBUG=False`.
+3. Set `DJANGO_ALLOWED_HOSTS` to the deployed domain.
+4. Set `DJANGO_CSRF_TRUSTED_ORIGINS` to the HTTPS origin, for example `https://example.com`.
+5. Set `DJANGO_SECURE_SSL_REDIRECT=True`.
+6. Set `DJANGO_SESSION_COOKIE_SECURE=True`.
+7. Set `DJANGO_CSRF_COOKIE_SECURE=True`.
+8. Configure `DJANGO_SECURE_HSTS_SECONDS` only after HTTPS is working correctly.
+9. Set the production Google OAuth redirect URI in both the deployment environment and Google Cloud credentials.
+10. Run database migrations.
+11. Run `python manage.py collectstatic --noinput`.
+12. Run `python manage.py check --deploy`.
+13. Use a production WSGI/ASGI server instead of Django's development server.
+
+### Static files
+
+Production static files are collected into:
+
+```text
+staticfiles/
+```
+
+Run:
+
+```bash
+python manage.py collectstatic --noinput
+```
+
+The repository does not commit generated static files.
+
+### Environment example for HTTPS
+
+```env
+DJANGO_SECRET_KEY=your-production-secret
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=example.com,www.example.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://example.com,https://www.example.com
+
+DJANGO_SECURE_SSL_REDIRECT=True
+DJANGO_SESSION_COOKIE_SECURE=True
+DJANGO_CSRF_COOKIE_SECURE=True
+DJANGO_SECURE_HSTS_SECONDS=3600
+DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=False
+DJANGO_SECURE_HSTS_PRELOAD=False
+
+GOOGLE_CLIENT_ID=your-production-client-id
+GOOGLE_CLIENT_SECRET=your-production-client-secret
+GOOGLE_REDIRECT_URI=https://example.com/google/callback/
+```
+
+Do not copy these example values literally. Replace the domain and Google OAuth values with the actual deployment configuration.
+
+### Database note
+
+The current configuration uses SQLite. This is suitable for development and testing. Before a production deployment with persistent application data, configure a production database such as PostgreSQL and provide the required database environment variables.
+
+### Google OAuth production configuration
+
+The Google OAuth client must allow the exact production callback URI. If the deployed site is:
+
+```text
+https://example.com
+```
+
+the callback should be:
+
+```text
+https://example.com/google/callback/
+```
+
+The local callback and production callback should be configured separately as appropriate for the Google OAuth client.
+
 ## License
 
 This project currently does not specify a license.
