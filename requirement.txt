@@ -1,5 +1,6 @@
-djangorestframework
-google-api-python-client
-google-auth-oauthlib
-google-auth
-python-dotenv
+django
+rest_framework
+google_auth_oauthlib
+google.oauth2
+googleapiclient
+dotenv
