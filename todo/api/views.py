@@ -15,7 +15,6 @@ from .models import LocalTask, GoogleOAuthToken
 from .serializers import LocalTaskSerializer
 from . import google_tasks_service
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 SCOPES = ['https://www.googleapis.com/auth/tasks']
 
 

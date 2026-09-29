@@ -124,10 +124,12 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-# Explicit path pointing directly to the static folder inside inner 'todo/api/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'todo' / 'api' / 'static',
+    BASE_DIR / 'api' / 'static',
 ]
+
+
+
 
 
 # Email
