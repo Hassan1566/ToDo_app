@@ -129,9 +129,8 @@ class LocalTaskAPITests(APITestCase):
     def test_sync_google_tasks_returns_import_count(self, mock_import):
         mock_import.return_value = 3
 
-        response = self.client.get(
-            reverse("task-sync-google"),
-        )
+        response = self.client.get(reverse("task-sync-google-tasks"))
+
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"], "success")
