@@ -49,12 +49,8 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-<<<<<<< HEAD
-    "django.contrib.sessions.middleware.SessionMiddleware",
-=======
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.middleware.sessions.SessionMiddleware",
->>>>>>> 4e851bfa23a836430925f4383b6f6ba8472377c6
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
