@@ -1,8 +1,9 @@
-import os
 import json
-from django.shortcuts import redirect, render
 from django.conf import settings
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect, render
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -16,6 +17,25 @@ from .serializers import LocalTaskSerializer
 from . import google_tasks_service
 
 SCOPES = ['https://www.googleapis.com/auth/tasks']
+
+
+# --- Authentication Views ---
+
+def register_view(request):
+    """Create a local Django account and log the user in."""
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/register.html', {'form': form})
 
 
 # --- Dashboard Frontend View ---
@@ -84,14 +104,14 @@ def google_auth_callback(request):
             'scopes': json.dumps(credentials.scopes),
         }
     )
-    return redirect('/')
+    return redirect('home')
 
 
 # --- LocalTaskViewSet (DRF ModelViewSet with Auto-Sync Hooks) ---
 
 class LocalTaskViewSet(viewsets.ModelViewSet):
     """
-    ModelViewSet providing full CRUD for Local Tasks and 
+    ModelViewSet providing full CRUD for Local Tasks and
     integrating automatic bidirectional sync with Google Tasks.
     """
     serializer_class = LocalTaskSerializer
