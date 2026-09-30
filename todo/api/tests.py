@@ -171,7 +171,8 @@ class AuthenticationTests(APITestCase):
         self.assertEqual(response.url, "/")
 
     def test_logout_redirects_to_login(self):
-        self.client.force_login(self.user)
+        user = User.objects.create_user(username="logoutuser", password="Strong-test-password-123")
+        self.client.force_login(user)
         response = self.client.post(reverse("logout"))
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertEqual(response.url, "/login/")
