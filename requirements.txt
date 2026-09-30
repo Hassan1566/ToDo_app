@@ -6,3 +6,5 @@ google-auth-oauthlib
 python-dotenv
 dj-database-url
 psycopg[binary]
+whitenoise[brotli]
+gunicorn
