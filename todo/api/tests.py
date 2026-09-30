@@ -136,3 +136,42 @@ class LocalTaskAPITests(APITestCase):
         self.assertEqual(response.data["status"], "success")
         self.assertEqual(response.data["imported_count"], 3)
         mock_import.assert_called_once_with(self.user)
+
+
+class AuthenticationTests(APITestCase):
+    def test_unauthenticated_home_redirects_to_login(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertIn("/login/", response.url)
+
+    def test_register_creates_user_and_logs_them_in(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "newuser",
+                "password1": "Strong-test-password-123",
+                "password2": "Strong-test-password-123",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, "/")
+        self.assertTrue(User.objects.filter(username="newuser").exists())
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+
+    def test_login_redirects_to_home(self):
+        User.objects.create_user(username="loginuser", password="Strong-test-password-123")
+        response = self.client.post(
+            reverse("login"),
+            {
+                "username": "loginuser",
+                "password": "Strong-test-password-123",
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, "/")
+
+    def test_logout_redirects_to_login(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse("logout"))
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(response.url, "/login/")
