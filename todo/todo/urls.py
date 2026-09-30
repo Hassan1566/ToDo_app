@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from api import views
@@ -11,6 +12,9 @@ router.register(r"tasks", views.LocalTaskViewSet, basename="task")
 urlpatterns = [
     path("", views.index_view, name="home"),
     path("admin/", admin.site.urls),
+    path("login/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("register/", views.register_view, name="register"),
     path("google/login/", views.google_auth_init, name="google_login"),
     path("google/callback/", views.google_auth_callback, name="google_callback"),
     path("api/", include(router.urls)),
