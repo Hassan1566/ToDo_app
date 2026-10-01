@@ -70,6 +70,7 @@ def google_auth_init(request):
         prompt='consent'
     )
     request.session['oauth_state'] = state
+    request.session['code_verifier'] = getattr(flow, 'code_verifier', None)
     return redirect(authorization_url)
 
 
@@ -90,7 +91,9 @@ def google_auth_callback(request):
         state=state,
         redirect_uri=settings.GOOGLE_REDIRECT_URI
     )
-    flow.fetch_token(authorization_response=request.build_absolute_uri())
+
+    code_verifier = request.session.get('code_verifier')
+    flow.fetch_token(authorization_response=request.build_absolute_uri(), code_verifier=code_verifier)
     credentials = flow.credentials
 
     GoogleOAuthToken.objects.update_or_create(

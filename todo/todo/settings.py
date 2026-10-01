@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
+
 def env_bool(name, default=False):
     return os.getenv(name, str(default)).lower() in {"1", "true", "yes", "on"}
 
@@ -57,8 +58,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "drf_spectacular.middleware.SpectacularSwaggerMiddleware",
-    "drf_spectacular.middleware.SpectacularAPIJSONMiddleware",
 ]
 
 ROOT_URLCONF = "todo.urls"
@@ -158,6 +157,9 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
+    "TITLE": "ToDo API",
+    "DESCRIPTION": "ToDo API",
+    "VERSION": "1.0.0",
     "SCHEMA_VIEW_SERIALIZER": None,
     "SCHEMA_VIEW_I18N_WSGI_ERROR_VIEW": None,
     "ENUM_NAME_OVERRIDES": {
