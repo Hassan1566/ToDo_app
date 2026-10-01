@@ -119,6 +119,7 @@ class LocalTaskViewSet(viewsets.ModelViewSet):
     """
     serializer_class = LocalTaskSerializer
     permission_classes = [IsAuthenticated]
+    queryset = LocalTask.objects.all()
 
     def get_queryset(self):
         # Multi-tenancy isolation: Users can only see & manage their own tasks

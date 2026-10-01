@@ -1,16 +1,164 @@
 openapi: 3.0.3
 info:
-  title: ''
-  version: 0.0.0
+  title: ToDo API
+  version: 1.0.0
+  description: ToDo API
 paths:
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - ht
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
   /api/tasks/:
     get:
-      operationId: api_tasks_list
+      operationId: tasks_list
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
       tags:
-      - api
+      - tasks
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -24,12 +172,12 @@ paths:
                   $ref: '#/components/schemas/LocalTask'
           description: ''
     post:
-      operationId: api_tasks_create
+      operationId: tasks_create
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
       tags:
-      - api
+      - tasks
       requestBody:
         content:
           application/json:
@@ -54,7 +202,7 @@ paths:
           description: ''
   /api/tasks/{id}/:
     get:
-      operationId: api_tasks_retrieve
+      operationId: tasks_retrieve
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
@@ -62,10 +210,11 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this local task.
         required: true
       tags:
-      - api
+      - tasks
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -77,7 +226,7 @@ paths:
                 $ref: '#/components/schemas/LocalTask'
           description: ''
     put:
-      operationId: api_tasks_update
+      operationId: tasks_update
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
@@ -85,10 +234,11 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this local task.
         required: true
       tags:
-      - api
+      - tasks
       requestBody:
         content:
           application/json:
@@ -112,7 +262,7 @@ paths:
                 $ref: '#/components/schemas/LocalTask'
           description: ''
     patch:
-      operationId: api_tasks_partial_update
+      operationId: tasks_partial_update
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
@@ -120,10 +270,11 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this local task.
         required: true
       tags:
-      - api
+      - tasks
       requestBody:
         content:
           application/json:
@@ -146,7 +297,7 @@ paths:
                 $ref: '#/components/schemas/LocalTask'
           description: ''
     delete:
-      operationId: api_tasks_destroy
+      operationId: tasks_destroy
       description: |-
         ModelViewSet providing full CRUD for Local Tasks and
         integrating automatic bidirectional sync with Google Tasks.
@@ -154,10 +305,11 @@ paths:
       - in: path
         name: id
         schema:
-          type: string
+          type: integer
+        description: A unique integer value identifying this local task.
         required: true
       tags:
-      - api
+      - tasks
       security:
       - cookieAuth: []
       - basicAuth: []
@@ -166,11 +318,11 @@ paths:
           description: No response body
   /api/tasks/sync-google/:
     get:
-      operationId: api_tasks_sync_google_retrieve
+      operationId: tasks_sync_google_retrieve
       description: 'Custom endpoint: GET /api/tasks/sync-google/ to pull external
         Google tasks.'
       tags:
-      - api
+      - tasks
       security:
       - cookieAuth: []
       - basicAuth: []

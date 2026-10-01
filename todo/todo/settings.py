@@ -162,9 +162,6 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SCHEMA_VIEW_SERIALIZER": None,
     "SCHEMA_VIEW_I18N_WSGI_ERROR_VIEW": None,
-    "ENUM_NAME_OVERRIDES": {
-        "django.contrib.auth.models.User.is_superuser": None,
-    },
 }
 
 SPECTACULAR_OAUTH2_CLIENT = {
