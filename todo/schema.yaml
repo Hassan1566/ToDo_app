@@ -1,0 +1,258 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/tasks/:
+    get:
+      operationId: api_tasks_list
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalTask'
+          description: ''
+    post:
+      operationId: api_tasks_create
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalTask'
+          description: ''
+  /api/tasks/{id}/:
+    get:
+      operationId: api_tasks_retrieve
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalTask'
+          description: ''
+    put:
+      operationId: api_tasks_update
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LocalTask'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalTask'
+          description: ''
+    patch:
+      operationId: api_tasks_partial_update
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLocalTask'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLocalTask'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLocalTask'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalTask'
+          description: ''
+    delete:
+      operationId: api_tasks_destroy
+      description: |-
+        ModelViewSet providing full CRUD for Local Tasks and
+        integrating automatic bidirectional sync with Google Tasks.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/tasks/sync-google/:
+    get:
+      operationId: api_tasks_sync_google_retrieve
+      description: 'Custom endpoint: GET /api/tasks/sync-google/ to pull external
+        Google tasks.'
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalTask'
+          description: ''
+components:
+  schemas:
+    LocalTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        notes:
+          type: string
+          nullable: true
+        is_completed:
+          type: boolean
+        google_task_id:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - google_task_id
+      - id
+      - title
+      - updated_at
+      - user
+    PatchedLocalTask:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        notes:
+          type: string
+          nullable: true
+        is_completed:
+          type: boolean
+        google_task_id:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

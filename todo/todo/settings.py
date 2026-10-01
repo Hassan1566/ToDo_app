@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "api",
+    "drf_spectacular",
     "django.contrib.sites",
 ]
 
@@ -56,6 +57,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "drf_spectacular.middleware.SpectacularSwaggerMiddleware",
+    "drf_spectacular.middleware.SpectacularAPIJSONMiddleware",
 ]
 
 ROOT_URLCONF = "todo.urls"
@@ -149,3 +152,23 @@ X_FRAME_OPTIONS = "DENY"
 
 # Tell Django that HTTPS may be terminated by a reverse proxy/load balancer.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "SCHEMA_VIEW_SERIALIZER": None,
+    "SCHEMA_VIEW_I18N_WSGI_ERROR_VIEW": None,
+    "ENUM_NAME_OVERRIDES": {
+        "django.contrib.auth.models.User.is_superuser": None,
+    },
+}
+
+SPECTACULAR_OAUTH2_CLIENT = {
+    'GOOGLE': {
+        'CLIENT_ID': GOOGLE_CLIENT_ID,
+        'CLIENT_SECRET': GOOGLE_CLIENT_SECRET,
+        'REDIRECT_URI': GOOGLE_REDIRECT_URI,
+    },
+}
