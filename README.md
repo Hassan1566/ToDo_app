@@ -214,7 +214,18 @@ To configure Google:
 
 ## REST API
 
-The API is protected with Django REST Framework authentication. Users can only access tasks belonging to their own account.
+The API is protected with Django REST Framework authentication. The task ViewSet uses `permission_classes = [IsAuthenticated]`, so every task endpoint requires an authenticated user. For the current browser-based application, DRF can authenticate the logged-in Django user through session authentication, using the same Django login session as the web dashboard.
+
+### Authentication model
+
+The application has two related authentication layers:
+
+1. **Django session authentication for the website** — users log in at `/login/`. Django creates a session, and the browser sends the session cookie with subsequent requests.
+2. **DRF `IsAuthenticated` permission for the API** — `IsAuthenticated` is a permission check, not a login mechanism. DRF authenticates the incoming request first; when the request is authenticated, `IsAuthenticated` allows access to the protected endpoint.
+
+The current API is therefore intended to be used by the same authenticated browser session as the Django frontend. The project does not currently use JWT authentication.
+
+Task ownership is enforced separately in `get_queryset()`, which filters tasks by `request.user`. This means an authenticated user can access only their own tasks.
 
 ### Endpoints
 
@@ -299,9 +310,15 @@ Example:
 
 ## API Documentation
 
-The current API contract is documented in this README and is available through Django REST Framework's browsable API during development.
+The API contract is documented in this README and is also exposed through `drf-spectacular` as an OpenAPI schema with Swagger UI. The interactive documentation is intended to make the API endpoints, request/response structures, and authentication requirements easier to inspect and test during development.
 
-An interactive OpenAPI/Swagger layer can be added later if needed.
+### API documentation endpoints
+
+- `/api/schema/` — OpenAPI schema
+- `/api/docs/` — Swagger UI
+- `/api/redoc/` — ReDoc
+
+These documentation views describe the REST API; they do not replace the application's Django login/session authentication.
 
 ## Security
 
