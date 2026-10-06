@@ -10,6 +10,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from django.contrib.auth.views import LoginView
 
 from google_auth_oauthlib.flow import Flow
 
@@ -31,12 +33,25 @@ def register_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            refresh = RefreshToken.for_user(user)
+            access = str(refresh.access_token)
+            request.session['jwt_access_token'] = access
             login(request, user)
             return redirect('home')
     else:
         form = UserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+
+class JWTLoginView(LoginView):
+    template_name = "registration/login.html"
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.get_user()
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+        self.request.session['jwt_access_token'] = access
+        return response
 
 
 # --- Dashboard Frontend View ---
@@ -45,7 +60,11 @@ def register_view(request):
 def index_view(request):
     """Renders the HTML Dashboard UI."""
     is_connected = GoogleOAuthToken.objects.filter(user=request.user).exists()
-    return render(request, 'index.html', {'is_connected': is_connected})
+    jwt_token = request.session.get('jwt_access_token', '')
+    return render(request, 'index.html', {
+        'is_connected': is_connected,
+        'jwt_token': jwt_token
+    })
 
 
 # --- Google OAuth Views ---
@@ -118,7 +137,6 @@ class LocalTaskViewSet(viewsets.ModelViewSet):
     ModelViewSet providing full CRUD for Local Tasks and
     integrating automatic bidirectional sync with Google Tasks.
     """
-    authentication_classes = [JWTAuthentication]
     serializer_class = LocalTaskSerializer
     permission_classes = [IsAuthenticated]
     queryset = LocalTask.objects.all()

@@ -119,6 +119,11 @@
 
     </main>
 
+    <!-- Pass token to JavaScript -->
+    <script>
+        window.JWT_ACCESS_TOKEN = "{{ jwt_token }}";
+    </script>
+    
     <!-- Custom JS File -->
     <script src="{% static '/js/app.js' %}"></script>
 </body>

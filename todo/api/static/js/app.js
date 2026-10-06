@@ -5,6 +5,7 @@
 // Helper: Extract CSRF Token from Django form
 const getCsrfToken = () => {
     const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    const headers = { 'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}` };
     return tokenInput ? tokenInput.value : '';
 };
 
@@ -19,7 +20,11 @@ async function loadTasks() {
     const container = document.getElementById('tasksList');
 
     try {
-        const response = await fetch('/api/tasks/');
+        const response = await fetch('/api/tasks/', {
+            headers: {
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`
+            }
+        });
         if (!response.ok) throw new Error('Failed to fetch tasks');
 
         const tasks = await response.json();
@@ -86,7 +91,8 @@ async function createTask(e) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': getCsrfToken(),
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`,
             },
             body: JSON.stringify({ title, notes })
         });
@@ -109,7 +115,8 @@ async function toggleTask(id, isCompleted) {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': getCsrfToken(),
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`
             },
             body: JSON.stringify({ is_completed: isCompleted })
         });
@@ -126,7 +133,8 @@ async function deleteTask(id) {
         await fetch(`/api/tasks/${id}/`, {
             method: 'DELETE',
             headers: {
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': getCsrfToken(),
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`,
             }
         });
         loadTasks();
@@ -144,7 +152,8 @@ async function syncTasks() {
         const response = await fetch('/api/tasks/sync-google/', {
             method: 'GET',
             headers: {
-                'X-CSRFToken': getCsrfToken()
+                'X-CSRFToken': getCsrfToken(),
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`,
             }
         });
         const res = await response.json();
@@ -162,3 +171,5 @@ async function syncTasks() {
 document.addEventListener('DOMContentLoaded', () => {
     loadTasks();
 });
+
+
