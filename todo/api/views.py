@@ -4,6 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -117,9 +118,11 @@ class LocalTaskViewSet(viewsets.ModelViewSet):
     ModelViewSet providing full CRUD for Local Tasks and
     integrating automatic bidirectional sync with Google Tasks.
     """
+    authentication_classes = [JWTAuthentication]
     serializer_class = LocalTaskSerializer
     permission_classes = [IsAuthenticated]
     queryset = LocalTask.objects.all()
+
 
     def get_queryset(self):
         # Multi-tenancy isolation: Users can only see & manage their own tasks
