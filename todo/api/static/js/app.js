@@ -8,6 +8,33 @@ const getCsrfToken = () => {
     return tokenInput ? tokenInput.value : '';
 };
 
+
+// Add this function to refresh token before expiry
+async function refreshJWTToken() {
+    try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) return;
+
+        const response = await fetch('/api/token/refresh/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('jwt_token', data.access);
+        }
+    } catch (err) {
+        console.error('Token refresh failed:', err);
+    }
+}
+
+// Refresh token every 4 minutes (before 5 min expiry)
+setInterval(refreshJWTToken, 4 * 60 * 1000);
+
 // Helper: Sanitize HTML strings to prevent XSS
 const escapeHtml = (text) => {
     if (!text) return '';

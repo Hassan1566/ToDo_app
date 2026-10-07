@@ -123,9 +123,15 @@
     <script>
         window.JWT_ACCESS_TOKEN = "{{ jwt_token }}";
     </script>
-    
+
     <!-- Custom JS File -->
     <script src="{% static '/js/app.js' %}"></script>
+    <script>
+        window.JWT_ACCESS_TOKEN = "{{ jwt_token }}";
+        localStorage.setItem('jwt_token', window.JWT_ACCESS_TOKEN);
+        // pass refresh token from django session to local storage
+        localStorage.setItem('refresh_token', "{{ refresh_token }}");
+    </script>
 </body>
 
 </html>

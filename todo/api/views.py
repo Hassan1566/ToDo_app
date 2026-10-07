@@ -36,6 +36,7 @@ def register_view(request):
             refresh = RefreshToken.for_user(user)
             access = str(refresh.access_token)
             request.session['jwt_access_token'] = access
+            request.session['jwt_refresh_token'] = str(refresh) 
             login(request, user)
             return redirect('home')
     else:
