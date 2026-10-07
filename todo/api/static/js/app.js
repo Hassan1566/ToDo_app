@@ -5,7 +5,6 @@
 // Helper: Extract CSRF Token from Django form
 const getCsrfToken = () => {
     const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
-    const headers = { 'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}` };
     return tokenInput ? tokenInput.value : '';
 };
 
