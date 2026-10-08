@@ -29,8 +29,9 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    # path("students/", student_views.StudentListCreate.as_view(), name="student-list-create"),
-    # path("students/<int:pk>/", student_views.StudentRetrieveUpdateDestroy.as_view(), name="student-retrieve-update-destroy"),
+    path("students/", student_views.StudentList.as_view(), name="student-list"),
+    path("students/<int:pk>/", student_views.StudentRetrieveUpdateDestroy.as_view(), name="student-retrieve-update-destroy"),
+    path("students/create/", student_views.StudentCreate.as_view(), name="student-create"),
 ]
 
 if settings.DEBUG:

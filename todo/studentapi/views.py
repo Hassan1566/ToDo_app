@@ -1,35 +1,33 @@
-from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView,RetrieveUpdateDestroyAPIView,CreateAPIView
 from .models import StudentModel
-from .serilaizer import StudentSerializer
+from .serilaizer import StudentSerializer,NormalUserSerializer
 from rest_framework.permissions import IsAuthenticated,IsAdminUser,AllowAny
 
-class StudentListCreate(ListCreateAPIView):
+class StudentList(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = StudentModel.objects.all()
+
+    
+  
+    
+
+class StudentCreate(CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = StudentModel.objects.all()
-    serializer_class = StudentSerializer
+    serializer_class = NormalUserSerializer
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-    def get_queryset(self):
-        if self.request.user:
-            return StudentModel.objects.all()
-        return StudentModel.objects.filter(name=self.request.user.username)
-    
-    def get(self, request, *args, **kwargs):
-        authentication_classes = []
-        permission_classes = [AllowAny]
-        return self.list(request, *args, **kwargs)
-
-    def get_serializer_class(self):
-        if self.request.user:
-            return StudentSerializer
-        return NormalUserSerializer
 
 class StudentRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated,IsAdminUser]
+    permission_classes = [IsAuthenticated]
     queryset = StudentModel.objects.all()
-    serializer_class = StudentSerializer
+    
 
-    def get_queryset(self):
-        if self.request.user:
-            return StudentModel.objects.all()
-        return StudentModel.objects.filter(name=self.request.user.username)
+
+    def get_permissions(self):
+        if self.request.method == "DELETE":
+            return [IsAdminUser()]
+        else:
+            return [IsAuthenticated()]
 

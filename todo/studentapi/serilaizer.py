@@ -10,5 +10,5 @@ class StudentSerializer(serializers.ModelSerializer):
 class NormalUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
-        fields = ['id','name','age','email']
-        read_only_fields = ['name','id']
+        fields = ['id','name','age','email','currentSemester','address','city']
+        read_only_fields = ['id']
