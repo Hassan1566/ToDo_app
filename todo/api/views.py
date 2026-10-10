@@ -33,11 +33,11 @@ def register_view(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            login(request, user)
             refresh = RefreshToken.for_user(user)
             access = str(refresh.access_token)
             request.session['jwt_access_token'] = access
             request.session['jwt_refresh_token'] = str(refresh) 
-            login(request, user)
             return redirect('home')
     else:
         form = UserCreationForm()
