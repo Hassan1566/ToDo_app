@@ -8,6 +8,72 @@ from rest_framework.test import APITestCase
 from .models import LocalTask
 
 
+
+
+
+
+class JWTAuthenticationTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jwtuser",
+            password="Strong-test-password-123",
+        )
+
+    def test_can_obtain_jwt_tokens(self):
+        response = self.client.post(
+            reverse("token_obtain_pair"),
+            {
+                "username": "jwtuser",
+                "password": "Strong-test-password-123",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+
+    def test_jwt_access_token_authenticates_task_request(self):
+        token_response = self.client.post(
+            reverse("token_obtain_pair"),
+            {
+                "username": "jwtuser",
+                "password": "Strong-test-password-123",
+            },
+            format="json",
+        )
+
+        access = token_response.data["access"]
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {access}"
+        )
+
+        response = self.client.get(reverse("task-list"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_refresh_endpoint_returns_new_access_token(self):
+        token_response = self.client.post(
+            reverse("token_obtain_pair"),
+            {
+                "username": "jwtuser",
+                "password": "Strong-test-password-123",
+            },
+            format="json",
+        )
+
+        refresh = token_response.data["refresh"]
+
+        response = self.client.post(
+            reverse("token_refresh"),
+            {"refresh": refresh},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+
+
 class LocalTaskAPITests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -129,7 +195,7 @@ class LocalTaskAPITests(APITestCase):
     def test_sync_google_tasks_returns_import_count(self, mock_import):
         mock_import.return_value = 3
 
-        response = self.client.get(reverse("task-sync-google-tasks"))
+        response = self.client.post(reverse("task-sync-google-tasks"))
 
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

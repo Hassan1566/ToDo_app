@@ -25,6 +25,7 @@ async function refreshJWTToken() {
 
         if (response.ok) {
             const data = await response.json();
+            window.JWT_ACCESS_TOKEN = data.access;
             localStorage.setItem('jwt_token', data.access);
         }
     } catch (err) {
@@ -135,37 +136,57 @@ async function createTask(e) {
 }
 
 // Toggle Task Completion (PATCH /api/tasks/{id}/)
+
 async function toggleTask(id, isCompleted) {
     try {
-        await fetch(`/api/tasks/${id}/`, {
+        const response = await fetch(`/api/tasks/${id}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCsrfToken(),
                 'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`
             },
-            body: JSON.stringify({ is_completed: isCompleted })
+            body: JSON.stringify({
+                is_completed: isCompleted
+            })
         });
-        loadTasks();
+
+        if (!response.ok) {
+            throw new Error(`Update failed: HTTP ${response.status}`);
+        }
+
+        await loadTasks();
     } catch (err) {
         console.error('Toggle task failed:', err);
+        alert('Could not update the task. Please try again.');
+        await loadTasks();
     }
 }
 
 // Delete Task (DELETE /api/tasks/{id}/)
+
 async function deleteTask(id) {
-    if (!confirm('Are you sure you want to delete this task?')) return;
+    if (!confirm('Are you sure you want to delete this task?')) {
+        return;
+    }
+
     try {
-        await fetch(`/api/tasks/${id}/`, {
+        const response = await fetch(`/api/tasks/${id}/`, {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': getCsrfToken(),
-                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`,
+                'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`
             }
         });
-        loadTasks();
+
+        if (!response.ok) {
+            throw new Error(`Delete failed: HTTP ${response.status}`);
+        }
+
+        await loadTasks();
     } catch (err) {
         console.error('Delete task failed:', err);
+        alert('Could not delete the task. Please try again.');
     }
 }
 
@@ -176,18 +197,22 @@ async function syncTasks() {
 
     try {
         const response = await fetch('/api/tasks/sync-google/', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'X-CSRFToken': getCsrfToken(),
                 'Authorization': `Bearer ${window.JWT_ACCESS_TOKEN}`,
             }
         });
+        if (!response.ok) {
+            throw new Error(`Sync failed: HTTP ${response.status}`);
+        }
         const res = await response.json();
         alert(res.message || 'Sync completed successfully!');
         loadTasks();
     } catch (err) {
         alert('Sync failed.');
         console.error('Sync failed:', err);
+        await loadTasks();
     } finally {
         if (icon) icon.classList.remove('animate-spin');
     }

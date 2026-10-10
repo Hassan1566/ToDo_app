@@ -50,8 +50,10 @@ class JWTLoginView(LoginView):
         response = super().form_valid(form)
         user = form.get_user()
         refresh = RefreshToken.for_user(user)
-        access = str(refresh.access_token)
-        self.request.session['jwt_access_token'] = access
+        self.request.session["jwt_access_token"] = str(refresh.access_token)
+        self.request.session["jwt_refresh_token"] = str(refresh)
+
+
         return response
 
 
@@ -61,10 +63,12 @@ class JWTLoginView(LoginView):
 def index_view(request):
     """Renders the HTML Dashboard UI."""
     is_connected = GoogleOAuthToken.objects.filter(user=request.user).exists()
-    jwt_token = request.session.get('jwt_access_token', '')
+    jwt_token = request.session.get("jwt_access_token", "")
+    refresh_toke = request.session.get("jwt_refresh_token", "")
     return render(request, 'index.html', {
         'is_connected': is_connected,
-        'jwt_token': jwt_token
+        'jwt_token': jwt_token,
+        'refresh_token': refresh_toke
     })
 
 
@@ -162,7 +166,8 @@ class LocalTaskViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         """1. Update local task; 2. Sync changes to Google Tasks if linked."""
         task = serializer.save()
-        if task.google_task_id:
+        last_update = task.updated_at
+        if task.google_task_id and task.updated_at == last_update:
             google_tasks_service.update_google_task(
                 user=self.request.user,
                 task_id=task.google_task_id,
@@ -180,9 +185,9 @@ class LocalTaskViewSet(viewsets.ModelViewSet):
             )
         instance.delete()
 
-    @action(detail=False, methods=['get'], url_path='sync-google')
+    @action(detail=False, methods=['post'], url_path='sync-google')
     def sync_google_tasks(self, request):
-        """Custom endpoint: GET /api/tasks/sync-google/ to pull external Google tasks."""
+        """Custom endpoint: POST /api/tasks/sync-google/ to pull external Google tasks."""
         imported_count = google_tasks_service.import_google_tasks_to_local(request.user)
         return Response({
             'status': 'success',

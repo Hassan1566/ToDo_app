@@ -24,6 +24,8 @@ services:
         sync: false
       - key: GOOGLE_REDIRECT_URI
         sync: false
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
 
 databases:
   - name: todo-db
