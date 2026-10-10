@@ -12,7 +12,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 router = DefaultRouter()
+studentRouter = DefaultRouter()
 router.register(r"tasks", views.LocalTaskViewSet, basename="task")
+studentRouter.register(r"students", student_views.StudentViewSet, basename="student")
 
 
 urlpatterns = [
@@ -29,9 +31,7 @@ urlpatterns = [
     path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("students/", student_views.StudentList.as_view(), name="student-list"),
-    path("students/<int:pk>/", student_views.StudentRetrieveUpdateDestroy.as_view(), name="student-retrieve-update-destroy"),
-    path("students/create/", student_views.StudentCreate.as_view(), name="student-create"),
+    path('students/', include(studentRouter.urls)),
 ]
 
 if settings.DEBUG:
